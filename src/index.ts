@@ -1,3 +1,4 @@
+/*
 import { Client } from "pg";
 
 function getClient() {
@@ -98,3 +99,4 @@ async function relationships() {
     }
 }
 // relationships();
+*/
