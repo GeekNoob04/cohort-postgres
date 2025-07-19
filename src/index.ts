@@ -6,38 +6,38 @@ function getClient() {
     });
 }
 // querying
-async function createUsersTable(
-    username: string,
-    email: string,
-    password: string
-) {
-    const client = getClient();
-    try {
-        await client.connect();
-        await client.query(`DROP TABLE IF EXISTS users;`);
+// async function createUsersTable(
+//     username: string,
+//     email: string,
+//     password: string
+// ) {
+//     const client = getClient();
+//     try {
+//         await client.connect();
+//         await client.query(`DROP TABLE IF EXISTS users;`);
 
-        const res = await client.query(`
-            CREATE TABLE users(
-                id SERIAL PRIMARY KEY,
-                username VARCHAR(50) UNIQUE NOT NULL,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-        console.log(res);
-        //to fix sql injection:
-        const insertQuery =
-            "INSERT INTO users(username,email,password) VALUES($1, $2, $3);";
-        const values = [username, email, password];
-        const res2 = await client.query(insertQuery, values);
-        console.log(res2);
-    } catch (e) {
-        console.log("Error during execution: " + e);
-    } finally {
-        await client.end();
-    }
-}
+//         const res = await client.query(`
+//             CREATE TABLE users(
+//                 id SERIAL PRIMARY KEY,
+//                 username VARCHAR(50) UNIQUE NOT NULL,
+//                 email VARCHAR(255) UNIQUE NOT NULL,
+//                 password VARCHAR(255) NOT NULL,
+//                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+//             );
+//         `);
+//         console.log(res);
+//         //to fix sql injection:
+//         const insertQuery =
+//             "INSERT INTO users(username,email,password) VALUES($1, $2, $3);";
+//         const values = [username, email, password];
+//         const res2 = await client.query(insertQuery, values);
+//         console.log(res2);
+//     } catch (e) {
+//         console.log("Error during execution: " + e);
+//     } finally {
+//         await client.end();
+//     }
+// }
 
 async function createEmail(email: string) {
     const client = getClient();
@@ -90,13 +90,33 @@ async function relationships() {
         await client.end();
     }
 }
+async function joinsUnderstand(user_id: string) {
+    const client = getClient();
+    try {
+        await client.connect();
+        const joinQuery = `
+        SELECT u.id, u.username, u.email, a.city, a.country, a.street, a.pincode
+        FROM users u
+        JOIN addresses a ON u.id = a.user_id
+        WHERE u.id = $1
+        `;
+        const uid = [user_id];
+        const resJoin = await client.query(joinQuery, uid);
+        console.log(resJoin);
+    } catch (e) {
+        console.log("Error while joining: " + e);
+    } finally {
+        client.end();
+    }
+}
 async function main() {
-    await createUsersTable(
-        "harshit",
-        "harshitbudhraja0@gmail.com",
-        "System@123"
-    );
+    // await createUsersTable(
+    //     "harshit",
+    //     "harshitbudhraja0@gmail.com",
+    //     "System@123"
+    // );
     await createEmail("harshitdon@gmail.com");
     await relationships();
+    await joinsUnderstand("1");
 }
 main();
