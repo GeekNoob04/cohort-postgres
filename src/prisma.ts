@@ -43,6 +43,15 @@ async function geteUser(username: string) {
     console.log(resGet);
 }
 
+async function deletUser(id: number) {
+    const userDelete = await prisma.user.delete({
+        where: {
+            id,
+        },
+    });
+    console.log(userDelete);
+}
+
 async function main() {
     await insertUser(
         "harshitkhatamhai@gmail.com",
@@ -55,5 +64,54 @@ async function main() {
         lastName: "budhrajasystem2",
     });
     geteUser("harshitkhatam@gmail.com");
+    deletUser(1);
 }
 main().catch(console.error);
+
+async function pracInsert(
+    username: string,
+    password: string,
+    firstName: string,
+    lastName: string
+) {
+    const pracInsert = await prisma.user.create({
+        data: { username, password, firstName, lastName },
+    });
+    console.log(pracInsert);
+}
+
+interface updatePractice {
+    username: string;
+    firstName: string;
+    lastName: string;
+}
+
+async function practUpdate(
+    username: string,
+    { firstName, lastName }: updateParams
+) {
+    const pracUpd = await prisma.user.update({
+        where: {
+            username,
+        },
+        data: {
+            firstName,
+            lastName,
+        },
+    });
+    console.log(pracUpd);
+}
+async function practDetails(username: string) {
+    const getUserPrac = await prisma.user.findFirst({
+        where: { username },
+    });
+    console.log(getUserPrac);
+}
+async function pracDelete(username: string) {
+    const pracDelete = await prisma.user.delete({
+        where: {
+            username,
+        },
+    });
+    console.log(pracDelete);
+}
