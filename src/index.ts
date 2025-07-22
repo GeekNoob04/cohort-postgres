@@ -68,6 +68,43 @@ async function relationships() {
         await client.end();
     }
 }
+async function transactionUserAndAdresses(
+    username: string,
+    email: string,
+    password: string,
+    city: string,
+    country: string,
+    street: string,
+    pincode: string
+) {
+    const client = getClient();
+    try {
+        await client.connect();
+        await client.query(`BEGIN`);
+        const insertUserText = `
+        INSERT INTO users (username,email,password)
+        VALUES ($1,$2,$3)
+        RETURNING id;
+        `;
+        const vals = [username, email, password];
+        const res = await client.query(insertUserText, vals);
+        const userId = res.rows[0].id;
+        console.log(userId);
+        const insertAdressText = `
+        INSERT INTO adresses (user_id,city,country,street,pincode)
+        VALUES ($1,$2,$3,$4,$5)
+        `;
+        const valAdress = [userId, city, country, street, pincode];
+        const resAdress = await client.query(insertAdressText, valAdress);
+        console.log(resAdress);
+        await client.query(`COMMIT`);
+    } catch (e) {
+        await client.query(`ROLLBACK`);
+        console.log("There was an error: " + e);
+    } finally {
+        await client.end();
+    }
+}
 async function insertUser(username: string, email: string, password: string) {
     const client = getClient();
     try {
