@@ -72,8 +72,7 @@ async function insertUser(username: string, email: string, password: string) {
     const client = getClient();
     try {
         await client.connect();
-        const insertQuery =
-            "INSERT INTO users(username,email,password) VALUES($1, $2, $3);";
+        const insertQuery = `INSERT INTO users(username,email,password) VALUES($1, $2, $3);`;
         const val = [username, email, password];
         const res = await client.query(insertQuery, val);
         console.log(res);
