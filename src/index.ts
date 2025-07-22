@@ -1,10 +1,3 @@
-import { Client } from "pg";
-
-function getClient() {
-    return new Client({
-        connectionString: process.env.DATABASE_URL,
-    });
-}
 // querying
 // async function createUsersTable(
 //     username: string,
@@ -38,27 +31,12 @@ function getClient() {
 //         await client.end();
 //     }
 // }
+import { Client } from "pg";
 
-async function createEmail(email: string) {
-    const client = getClient();
-    try {
-        await client.connect();
-        const query = "SELECT * FROM users WHERE email = $1";
-        const value = [email];
-        const res = await client.query(query, value);
-        console.log(res);
-        if (res.rows.length > 0) {
-            console.log("user found: ", res.rows[0]);
-            return res.rows[0];
-        } else {
-            console.log("user not found");
-            return null;
-        }
-    } catch (e) {
-        console.log("There was an error in the query: " + e);
-    } finally {
-        await client.end();
-    }
+function getClient() {
+    return new Client({
+        connectionString: process.env.DATABASE_URL,
+    });
 }
 async function relationships() {
     const client = getClient();
@@ -90,6 +68,57 @@ async function relationships() {
         await client.end();
     }
 }
+async function insertUser(username: string, email: string, password: string) {
+    const client = getClient();
+    try {
+        await client.connect();
+        const insertQuery =
+            "INSERT INTO users(username,email,password) VALUES($1, $2, $3);";
+        const val = [username, email, password];
+        const res = await client.query(insertQuery, val);
+        console.log(res);
+    } catch (e) {
+        console.log("There was an issue: " + e);
+    } finally {
+        client.end();
+    }
+}
+async function updatetUser(username: string, email: string, password: string) {
+    const client = getClient();
+    try {
+        await client.connect();
+        const updateQuery = "UPDATE users SET password = $1 WHERE email = $2;";
+        const val = [password, email];
+        const res = await client.query(updateQuery, val);
+        console.log(res);
+    } catch (e) {
+        console.log("There was an issue: " + e);
+    } finally {
+        client.end();
+    }
+}
+async function createEmail(email: string) {
+    const client = getClient();
+    try {
+        await client.connect();
+        const query = "SELECT * FROM users WHERE email = $1";
+        const value = [email];
+        const res = await client.query(query, value);
+        console.log(res);
+        if (res.rows.length > 0) {
+            console.log("user found: ", res.rows[0]);
+            return res.rows[0];
+        } else {
+            console.log("user not found");
+            return null;
+        }
+    } catch (e) {
+        console.log("There was an error in the query: " + e);
+    } finally {
+        await client.end();
+    }
+}
+
 async function joinsUnderstand(user_id: string) {
     const client = getClient();
     try {
