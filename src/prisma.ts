@@ -51,6 +51,36 @@ async function deletUser(id: number) {
     });
     console.log(userDelete);
 }
+async function createTodos(title: string, description: string, userId: number) {
+    const createTodosRes = await prisma.todos.create({
+        data: {
+            title,
+            description,
+            userId,
+        },
+    });
+    console.log(createTodosRes);
+}
+async function getTodos(userId: number) {
+    const getTodosRes = await prisma.todos.findMany({
+        where: {
+            userId,
+        },
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            user: true, // user and todos are related
+            // user: {
+            //     select: {
+            //         firstName: true,
+            //         lastName: true,
+            //     },
+            // },
+        },
+    });
+    console.log(getTodosRes);
+}
 
 async function main() {
     await insertUser(
@@ -65,6 +95,8 @@ async function main() {
     });
     geteUser("harshitkhatam@gmail.com");
     deletUser(1);
+    createTodos("TODO 1", "first todo", 1);
+    getTodos(1);
 }
 main().catch(console.error);
 
